@@ -13,3 +13,9 @@ export const createCardSchema = joi.object({
     .required(),
   employeeId: joi.number().required(),
 });
+
+export const activateCardSchema = joi.object({
+  id: joi.number().required(),
+  CVC: joi.string().required(),
+  password: joi.number().required(),
+});
