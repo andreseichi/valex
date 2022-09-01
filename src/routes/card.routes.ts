@@ -1,13 +1,18 @@
 import { Router } from "express";
+import { createCard } from "../controllers/cardController";
+import {
+  validateHeaderSchema,
+  validateSchema,
+} from "../middlewares/schemaMiddleware";
+import { apiKeySchema, createCardSchema } from "../schemas/cardSchema";
 
 const cardRouter = Router();
 
-cardRouter.get("/cards", (req, res) => {
-  console.log("hello");
-
-  return res.send("hello");
-});
-
-cardRouter.post("/cards");
+cardRouter.post(
+  "/card",
+  validateHeaderSchema(apiKeySchema),
+  validateSchema(createCardSchema),
+  createCard
+);
 
 export { cardRouter };
