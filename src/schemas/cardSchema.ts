@@ -6,9 +6,10 @@ export const apiKeySchema = joi
   })
   .unknown(true);
 
-export const typeCardSchema = joi.object({
+export const createCardSchema = joi.object({
   type: joi
     .string()
     .valid("groceries", "restaurants", "transport", "education", "health")
     .required(),
+  employeeId: joi.number().required(),
 });
