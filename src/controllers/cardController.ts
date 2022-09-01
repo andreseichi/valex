@@ -1,13 +1,18 @@
 import { Request, Response } from "express";
 
-import { find } from "../repositories/cardRepository";
+import { createCardService } from "../services/cardService";
+import { TransactionTypes } from "../repositories/cardRepository";
 
-export async function getCards(req: Request, res: Response) {
+export async function createCard(req: Request, res: Response) {
   try {
-    const rows = await find();
+    const apiKey: string = res.locals.headers["x-api-key"];
+    const employeeId: number = res.locals.body.employeeId;
+    const cardType: TransactionTypes = res.locals.body.type;
 
-    console.log(rows);
-  } catch (error) {}
+    const result = await createCardService(apiKey, employeeId, cardType);
 
-  return res.send("get cards");
+    return res.send("create card");
+  } catch (error) {
+    console.log(error);
+  }
 }
