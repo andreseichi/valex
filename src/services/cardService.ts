@@ -1,7 +1,14 @@
 import { faker } from "@faker-js/faker";
+import dayjs from "dayjs";
+import Cryptr from "cryptr";
+
+import dotenv from "dotenv";
+dotenv.config();
 
 import {
+  CardInsertData,
   findByTypeAndEmployeeId,
+  insert,
   TransactionTypes,
 } from "../repositories/cardRepository";
 import { findByApiKey } from "../repositories/companyRepository";
@@ -32,6 +39,7 @@ export async function createCardService(
     }
 
     const cardNumber = faker.finance.creditCardNumber("####-####-####-####");
+
     const employeeFullName = employeeActive.fullName;
     const employeeFullNameFiltered = employeeFullName
       .split(" ")
@@ -44,7 +52,25 @@ export async function createCardService(
       .map((name) => name[0])
       .join(" ")} ${lastName}`.toUpperCase();
 
-    console.log(cardholderName);
+    const expirationDate = dayjs().add(5, "y").format("MM/YY");
+
+    const securityCode = faker.finance.creditCardCVV();
+
+    const cryptr = new Cryptr(process.env.CRYPTR_SECRET);
+    const securityCodeEncrypted = cryptr.encrypt(securityCode);
+
+    const cardData: CardInsertData = {
+      employeeId,
+      number: cardNumber,
+      cardholderName,
+      securityCode: securityCodeEncrypted,
+      expirationDate,
+      isVirtual: false,
+      isBlocked: true,
+      type: cardType,
+    };
+
+    await insert(cardData);
   } catch (error) {
     console.log(error);
     return error;

@@ -11,7 +11,8 @@ export async function createCard(req: Request, res: Response) {
 
     const result = await createCardService(apiKey, employeeId, cardType);
 
-    return res.send("create card");
+    console.log(result);
+    return res.send({ result });
   } catch (error) {
     console.log(error);
   }
