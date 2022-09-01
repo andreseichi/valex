@@ -71,6 +71,10 @@ export async function createCardService(
     };
 
     await insert(cardData);
+    return {
+      type: "success",
+      message: "New card created. You need to create a password to active it",
+    };
   } catch (error) {
     console.log(error);
     return error;
