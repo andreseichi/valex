@@ -1,3 +1,5 @@
+import { faker } from "@faker-js/faker";
+
 import {
   findByTypeAndEmployeeId,
   TransactionTypes,
@@ -29,8 +31,22 @@ export async function createCardService(
       throw { type: "card_already_exists", message: "Card already exists" };
     }
 
-    console.log(employeeActive);
+    const cardNumber = faker.finance.creditCardNumber("####-####-####-####");
+    const employeeFullName = employeeActive.fullName;
+    const employeeFullNameFiltered = employeeFullName
+      .split(" ")
+      .filter((name) => name.length >= 3);
+    const firstName = employeeFullNameFiltered[0];
+    const lastName =
+      employeeFullNameFiltered[employeeFullNameFiltered.length - 1];
+    const cardholderName = `${firstName} ${employeeFullNameFiltered
+      .slice(1, employeeFullNameFiltered.length - 1)
+      .map((name) => name[0])
+      .join(" ")} ${lastName}`.toUpperCase();
+
+    console.log(cardholderName);
   } catch (error) {
+    console.log(error);
     return error;
   }
 }
