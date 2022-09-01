@@ -17,3 +17,11 @@ export async function createCard(req: Request, res: Response) {
     console.log(error);
   }
 }
+
+export async function activateCard(req: Request, res: Response) {
+  try {
+    const { id, CVC, password }: { id: number; CVC: string; password: number } =
+      res.locals.body;
+    console.log(res.locals.body);
+  } catch (error) {}
+}

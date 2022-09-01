@@ -1,10 +1,14 @@
 import { Router } from "express";
-import { createCard } from "../controllers/cardController";
+import { activateCard, createCard } from "../controllers/cardController";
 import {
   validateHeaderSchema,
   validateSchema,
 } from "../middlewares/schemaMiddleware";
-import { apiKeySchema, createCardSchema } from "../schemas/cardSchema";
+import {
+  activateCardSchema,
+  apiKeySchema,
+  createCardSchema,
+} from "../schemas/cardSchema";
 
 const cardRouter = Router();
 
@@ -14,5 +18,7 @@ cardRouter.post(
   validateSchema(createCardSchema),
   createCard
 );
+
+cardRouter.post("/activate", validateSchema(activateCardSchema), activateCard);
 
 export { cardRouter };
