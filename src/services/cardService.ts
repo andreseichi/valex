@@ -7,19 +7,21 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import {
-  CardInsertData,
-  CardUpdateData,
   findByCardDetails,
   findById as findCardById,
   findByTypeAndEmployeeId,
   insert,
-  TransactionTypes,
   update,
 } from "../repositories/cardRepository";
 import { findByApiKey } from "../repositories/companyRepository";
 import { findById } from "../repositories/employeeRepository";
 import { getCardholderName } from "../utils/getCardholderName";
 import { checkExpirationDate } from "../utils/checkExpirationDate";
+import {
+  CardInsertData,
+  CardUpdateData,
+  TransactionTypes,
+} from "../types/card";
 
 export async function createCardService(
   apiKey: string,
