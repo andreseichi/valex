@@ -70,7 +70,7 @@ export async function createCardService(
       securityCode: securityCodeEncrypted,
       expirationDate,
       isVirtual: false,
-      isBlocked: true,
+      isBlocked: false,
       type: cardType,
     };
 
