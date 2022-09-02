@@ -9,6 +9,7 @@ dotenv.config();
 import {
   CardInsertData,
   CardUpdateData,
+  findByCardDetails,
   findById as findCardById,
   findByTypeAndEmployeeId,
   insert,
@@ -17,6 +18,8 @@ import {
 } from "../repositories/cardRepository";
 import { findByApiKey } from "../repositories/companyRepository";
 import { findById } from "../repositories/employeeRepository";
+import { getCardholderName } from "../utils/getCardholderName";
+import { checkExpirationDate } from "../utils/checkExpirationDate";
 
 export async function createCardService(
   apiKey: string,
@@ -45,16 +48,7 @@ export async function createCardService(
     const cardNumber = faker.finance.creditCardNumber("####-####-####-####");
 
     const employeeFullName = employeeActive.fullName;
-    const employeeFullNameFiltered = employeeFullName
-      .split(" ")
-      .filter((name) => name.length >= 3);
-    const firstName = employeeFullNameFiltered[0];
-    const lastName =
-      employeeFullNameFiltered[employeeFullNameFiltered.length - 1];
-    const cardholderName = `${firstName} ${employeeFullNameFiltered
-      .slice(1, employeeFullNameFiltered.length - 1)
-      .map((name) => name[0])
-      .join(" ")} ${lastName}`.toUpperCase();
+    const cardholderName = getCardholderName(employeeFullName);
 
     const expirationDate = dayjs().add(5, "y").format("MM/YY");
 
@@ -97,11 +91,7 @@ export async function activateCardService(
     }
 
     const expirationDate = cardDB.expirationDate;
-    const today = dayjs().format("MM/YY");
-
-    const dateExpirationDate = dayjs(expirationDate);
-    const dateToday = dayjs(today);
-    const diff = dateExpirationDate.diff(dateToday);
+    const diff = checkExpirationDate(expirationDate);
 
     if (diff < 0) {
       throw { type: "card_expired", message: "Card is expired" };
@@ -142,6 +132,63 @@ export async function activateCardService(
     return {
       type: "success",
       message: "Card activated",
+    };
+  } catch (error) {
+    console.log(error);
+
+    return error;
+  }
+}
+
+export async function blockCardService(
+  cardNumber: string,
+  fullName: string,
+  expirationDate: string,
+  password: number
+) {
+  try {
+    const cardholderName = getCardholderName(fullName);
+    const cardDB = await findByCardDetails(
+      cardNumber,
+      cardholderName,
+      expirationDate
+    );
+    if (!cardDB) {
+      throw { type: "invalid_card_number", message: "Card is not registered" };
+    }
+
+    const expirationDateDB = cardDB.expirationDate;
+    const diff = checkExpirationDate(expirationDateDB);
+
+    if (diff < 0) {
+      throw { type: "card_expired", message: "Card is expired" };
+    }
+
+    const passwordDB = cardDB.password;
+    if (!compareSync(password.toString(), passwordDB)) {
+      throw {
+        type: "invalid_password",
+        message: "Invalid password",
+      };
+    }
+
+    const isCardDBBlocked = cardDB.isBlocked;
+    if (isCardDBBlocked) {
+      throw {
+        type: "card_already_blocked",
+        message: "Card already blocked",
+      };
+    }
+
+    const cardData: CardUpdateData = {
+      isBlocked: true,
+    };
+
+    await update(cardDB.id, cardData);
+
+    return {
+      type: "success",
+      message: "Card blocked",
     };
   } catch (error) {
     console.log(error);
