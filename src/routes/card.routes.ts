@@ -1,5 +1,9 @@
 import { Router } from "express";
-import { activateCard, createCard } from "../controllers/cardController";
+import {
+  activateCard,
+  blockCard,
+  createCard,
+} from "../controllers/cardController";
 import {
   validateHeaderSchema,
   validateSchema,
@@ -7,6 +11,7 @@ import {
 import {
   activateCardSchema,
   apiKeySchema,
+  blockCardSchema,
   createCardSchema,
 } from "../schemas/cardSchema";
 
@@ -24,5 +29,7 @@ cardRouter.put(
   validateSchema(activateCardSchema),
   activateCard
 );
+
+cardRouter.put("/card/block", validateSchema(blockCardSchema), blockCard);
 
 export { cardRouter };
