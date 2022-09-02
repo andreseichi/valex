@@ -19,3 +19,10 @@ export const activateCardSchema = joi.object({
   CVC: joi.string().required(),
   password: joi.number().required(),
 });
+
+export const blockCardSchema = joi.object({
+  number: joi.string().required(),
+  cardholderName: joi.string().required(),
+  expirationDate: joi.string().required(),
+  password: joi.number().required(),
+});
