@@ -1,5 +1,3 @@
-import { faker } from "@faker-js/faker";
-import dayjs from "dayjs";
 import Cryptr from "cryptr";
 import { hashSync, compareSync } from "bcrypt";
 
@@ -17,11 +15,8 @@ import { findByApiKey } from "../repositories/companyRepository";
 import { findById } from "../repositories/employeeRepository";
 import { getCardholderName } from "../utils/getCardholderName";
 import { checkExpirationDate } from "../utils/checkExpirationDate";
-import {
-  CardInsertData,
-  CardUpdateData,
-  TransactionTypes,
-} from "../types/card";
+import { CardUpdateData, TransactionTypes } from "../types/card";
+import { createCard } from "../utils/createCard";
 
 export async function createCardService(
   apiKey: string,
@@ -47,28 +42,7 @@ export async function createCardService(
       throw { type: "card_already_exists", message: "Card already exists" };
     }
 
-    const cardNumber = faker.finance.creditCardNumber("####-####-####-####");
-
-    const employeeFullName = employeeActive.fullName;
-    const cardholderName = getCardholderName(employeeFullName);
-
-    const expirationDate = dayjs().add(5, "y").format("MM/YY");
-
-    const securityCode = faker.finance.creditCardCVV();
-
-    const cryptr = new Cryptr(process.env.CRYPTR_SECRET);
-    const securityCodeEncrypted = cryptr.encrypt(securityCode);
-
-    const cardData: CardInsertData = {
-      employeeId,
-      number: cardNumber,
-      cardholderName,
-      securityCode: securityCodeEncrypted,
-      expirationDate,
-      isVirtual: false,
-      isBlocked: false,
-      type: cardType,
-    };
+    const cardData = createCard(employeeId, employeeActive, cardType);
 
     await insert(cardData);
     return {
