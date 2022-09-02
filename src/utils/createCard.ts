@@ -2,11 +2,11 @@ import { faker } from "@faker-js/faker";
 import Cryptr from "cryptr";
 import dayjs from "dayjs";
 
-import { Employee } from "../repositories/employeeRepository";
 import { CardInsertData as Card, TransactionTypes } from "../types/card";
 import { getCardholderName } from "./getCardholderName";
 
 import dotenv from "dotenv";
+import { Employee } from "../types/employee";
 dotenv.config();
 
 export function createCard(

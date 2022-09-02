@@ -1,12 +1,5 @@
 import { connection } from "../database/postgres";
-
-export interface Employee {
-  id: number;
-  fullName: string;
-  cpf: string;
-  email: string;
-  companyId: number;
-}
+import { Employee } from "../types/employee";
 
 export async function findById(id: number) {
   const result = await connection.query<Employee, [number]>(
