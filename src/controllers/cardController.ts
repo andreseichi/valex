@@ -1,6 +1,9 @@
 import { Request, Response } from "express";
 
-import { createCardService } from "../services/cardService";
+import {
+  activateCardService,
+  createCardService,
+} from "../services/cardService";
 import { TransactionTypes } from "../repositories/cardRepository";
 
 export async function createCard(req: Request, res: Response) {
@@ -15,6 +18,8 @@ export async function createCard(req: Request, res: Response) {
     return res.send({ result });
   } catch (error) {
     console.log(error);
+
+    // TODO tratar o erro
   }
 }
 
@@ -22,6 +27,13 @@ export async function activateCard(req: Request, res: Response) {
   try {
     const { id, CVC, password }: { id: number; CVC: string; password: number } =
       res.locals.body;
-    console.log(res.locals.body);
-  } catch (error) {}
+
+    const result = await activateCardService(id, CVC, password);
+
+    return res.send({ result });
+  } catch (error) {
+    console.log(error);
+
+    // TODO tratar o erro
+  }
 }

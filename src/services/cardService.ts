@@ -1,15 +1,19 @@
 import { faker } from "@faker-js/faker";
 import dayjs from "dayjs";
 import Cryptr from "cryptr";
+import { hashSync, compareSync } from "bcrypt";
 
 import dotenv from "dotenv";
 dotenv.config();
 
 import {
   CardInsertData,
+  CardUpdateData,
+  findById as findCardById,
   findByTypeAndEmployeeId,
   insert,
   TransactionTypes,
+  update,
 } from "../repositories/cardRepository";
 import { findByApiKey } from "../repositories/companyRepository";
 import { findById } from "../repositories/employeeRepository";
@@ -77,6 +81,71 @@ export async function createCardService(
     };
   } catch (error) {
     console.log(error);
+    return error;
+  }
+}
+
+export async function activateCardService(
+  cardId: number,
+  CVC: string,
+  password: number
+) {
+  try {
+    const cardDB = await findCardById(cardId);
+    if (!cardDB) {
+      throw { type: "invalid_card_id", message: "Card is not registered" };
+    }
+
+    const expirationDate = cardDB.expirationDate;
+    const today = dayjs().format("MM/YY");
+
+    const dateExpirationDate = dayjs(expirationDate);
+    const dateToday = dayjs(today);
+    const diff = dateExpirationDate.diff(dateToday);
+
+    if (diff < 0) {
+      throw { type: "card_expired", message: "Card is expired" };
+    }
+
+    if (cardDB.password) {
+      throw {
+        type: "card_already_activated",
+        message: "Card already activated",
+      };
+    }
+
+    const cryptr = new Cryptr(process.env.CRYPTR_SECRET);
+    const securityCodeDecrypted = cryptr.decrypt(cardDB.securityCode);
+
+    if (CVC !== securityCodeDecrypted) {
+      throw {
+        type: "invalid_cvc",
+        message: "Invalid CVC",
+      };
+    }
+
+    if (password.toString().length !== 4) {
+      throw {
+        type: "invalid_password",
+        message: "Invalid password",
+      };
+    }
+
+    const passwordEncrypted = hashSync(password.toString(), 10);
+
+    const cardData: CardUpdateData = {
+      password: passwordEncrypted,
+    };
+
+    await update(cardId, cardData);
+
+    return {
+      type: "success",
+      message: "Card activated",
+    };
+  } catch (error) {
+    console.log(error);
+
     return error;
   }
 }

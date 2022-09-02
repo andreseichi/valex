@@ -19,6 +19,10 @@ cardRouter.post(
   createCard
 );
 
-cardRouter.post("/activate", validateSchema(activateCardSchema), activateCard);
+cardRouter.put(
+  "/card/activate",
+  validateSchema(activateCardSchema),
+  activateCard
+);
 
 export { cardRouter };
