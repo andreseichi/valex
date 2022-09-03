@@ -9,7 +9,9 @@ type typeEnum =
   | "invalid_password"
   | "password_not_match"
   | "card_already_blocked"
-  | "card_already_unblocked";
+  | "card_already_unblocked"
+  | "card_not_activated"
+  | "card_blocked";
 
 export interface errors {
   type: typeEnum;

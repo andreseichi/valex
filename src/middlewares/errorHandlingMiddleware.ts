@@ -40,5 +40,11 @@ export const errorHandlingMiddleware = (
   if (error.type === "card_already_unblocked")
     return res.status(409).send({ message: error.message });
 
+  if (error.type === "card_not_activated")
+    return res.status(401).send({ message: error.message });
+
+  if (error.type === "card_blocked")
+    return res.status(401).send({ message: error.message });
+
   return res.sendStatus(500);
 };
