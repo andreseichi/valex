@@ -6,12 +6,12 @@ export async function rechargeCard(req: Request, res: Response) {
   const apiKey: string = res.locals.headers["x-api-key"];
   const {
     number,
-    cardholderName,
+    fullName,
     expirationDate,
     amount,
   }: {
     number: string;
-    cardholderName: string;
+    fullName: string;
     expirationDate: string;
     amount: number;
   } = res.locals.body;
@@ -19,7 +19,7 @@ export async function rechargeCard(req: Request, res: Response) {
   const result = await rechargeCardService(
     apiKey,
     number,
-    cardholderName,
+    fullName,
     expirationDate,
     amount
   );

@@ -4,14 +4,14 @@ import { purchaseCardService } from "../services/purchaseService";
 export async function purchase(req: Request, res: Response) {
   const {
     number,
-    cardholderName,
+    fullName,
     expirationDate,
     password,
     businessId,
     amount,
   }: {
     number: string;
-    cardholderName: string;
+    fullName: string;
     expirationDate: string;
     password: number;
     businessId: number;
@@ -20,7 +20,7 @@ export async function purchase(req: Request, res: Response) {
 
   const result = await purchaseCardService(
     number,
-    cardholderName,
+    fullName,
     expirationDate,
     password,
     businessId,

@@ -22,19 +22,15 @@ export async function createCard(req: Request, res: Response) {
 export async function getCardBalance(req: Request, res: Response) {
   const {
     number,
-    cardholderName,
+    fullName,
     expirationDate,
   }: {
     number: string;
-    cardholderName: string;
+    fullName: string;
     expirationDate: string;
   } = res.locals.body;
 
-  const result = await getCardBalanceService(
-    number,
-    cardholderName,
-    expirationDate
-  );
+  const result = await getCardBalanceService(number, fullName, expirationDate);
 
   return res.send({ result });
 }
@@ -42,13 +38,13 @@ export async function getCardBalance(req: Request, res: Response) {
 export async function activateCard(req: Request, res: Response) {
   const {
     number,
-    cardholderName,
+    fullName,
     expirationDate,
     password,
     CVC,
   }: {
     number: string;
-    cardholderName: string;
+    fullName: string;
     expirationDate: string;
     password: number;
     CVC: string;
@@ -56,7 +52,7 @@ export async function activateCard(req: Request, res: Response) {
 
   const result = await activateCardService(
     number,
-    cardholderName,
+    fullName,
     expirationDate,
     password,
     CVC
@@ -68,19 +64,19 @@ export async function activateCard(req: Request, res: Response) {
 export async function blockCard(req: Request, res: Response) {
   const {
     number,
-    cardholderName,
+    fullName,
     expirationDate,
     password,
   }: {
     number: string;
-    cardholderName: string;
+    fullName: string;
     expirationDate: string;
     password: number;
   } = res.locals.body;
 
   const result = await blockCardService(
     number,
-    cardholderName,
+    fullName,
     expirationDate,
     password
   );
@@ -91,19 +87,19 @@ export async function blockCard(req: Request, res: Response) {
 export async function unblockCard(req: Request, res: Response) {
   const {
     number,
-    cardholderName,
+    fullName,
     expirationDate,
     password,
   }: {
     number: string;
-    cardholderName: string;
+    fullName: string;
     expirationDate: string;
     password: number;
   } = res.locals.body;
 
   const result = await unblockCardService(
     number,
-    cardholderName,
+    fullName,
     expirationDate,
     password
   );
