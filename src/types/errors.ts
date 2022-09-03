@@ -8,7 +8,8 @@ type typeEnum =
   | "invalid_cvc"
   | "invalid_password"
   | "password_not_match"
-  | "card_already_blocked";
+  | "card_already_blocked"
+  | "card_already_unblocked";
 
 export interface errors {
   type: typeEnum;
