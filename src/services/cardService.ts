@@ -158,3 +158,57 @@ export async function blockCardService(
     message: "Card blocked",
   };
 }
+
+export async function unblockCardService(
+  cardNumber: string,
+  fullName: string,
+  expirationDate: string,
+  password: number
+) {
+  const cardholderName = getCardholderName(fullName);
+  const cardDB = await findByCardDetails(
+    cardNumber,
+    cardholderName,
+    expirationDate
+  );
+  if (!cardDB) {
+    throw {
+      type: "invalid_card",
+      message: "Invalid card or card is not registered",
+    };
+  }
+
+  const expirationDateDB = cardDB.expirationDate;
+  const diff = checkExpirationDate(expirationDateDB);
+
+  if (diff < 0) {
+    throw { type: "card_expired", message: "Card is expired" };
+  }
+
+  const passwordDB = cardDB.password;
+  if (!compareSync(password.toString(), passwordDB)) {
+    throw {
+      type: "password_not_match",
+      message: "Password is incorrect",
+    };
+  }
+
+  const isCardDBBlocked = cardDB.isBlocked;
+  if (!isCardDBBlocked) {
+    throw {
+      type: "card_already_unblocked",
+      message: "Card already unblocked",
+    };
+  }
+
+  const cardData: CardUpdateData = {
+    isBlocked: false,
+  };
+
+  await update(cardDB.id, cardData);
+
+  return {
+    type: "success",
+    message: "Card unblocked",
+  };
+}

@@ -4,6 +4,7 @@ import {
   activateCardService,
   blockCardService,
   createCardService,
+  unblockCardService,
 } from "../services/cardService";
 import { TransactionTypes } from "../types/card";
 
@@ -40,6 +41,29 @@ export async function blockCard(req: Request, res: Response) {
   } = res.locals.body;
 
   const result = await blockCardService(
+    number,
+    cardholderName,
+    expirationDate,
+    password
+  );
+
+  return res.send({ result });
+}
+
+export async function unblockCard(req: Request, res: Response) {
+  const {
+    number,
+    cardholderName,
+    expirationDate,
+    password,
+  }: {
+    number: string;
+    cardholderName: string;
+    expirationDate: string;
+    password: number;
+  } = res.locals.body;
+
+  const result = await unblockCardService(
     number,
     cardholderName,
     expirationDate,

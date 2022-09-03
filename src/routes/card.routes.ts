@@ -3,6 +3,7 @@ import {
   activateCard,
   blockCard,
   createCard,
+  unblockCard,
 } from "../controllers/cardController";
 import {
   validateHeaderSchema,
@@ -34,6 +35,12 @@ cardRouter.put(
   "/card/block",
   validateSchema(blockUnblockCardSchema),
   blockCard
+);
+
+cardRouter.put(
+  "/card/unblock",
+  validateSchema(blockUnblockCardSchema),
+  unblockCard
 );
 
 export { cardRouter };
