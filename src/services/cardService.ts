@@ -1,44 +1,32 @@
-import Cryptr from "cryptr";
-import { hashSync, compareSync } from "bcrypt";
+import { hashSync } from "bcrypt";
 
-import dotenv from "dotenv";
-dotenv.config();
-
-import {
-  findByCardDetails,
-  findById as findCardById,
-  findByTypeAndEmployeeId,
-  insert,
-  update,
-} from "../repositories/cardRepository";
-import { findByApiKey } from "../repositories/companyRepository";
-import { findById } from "../repositories/employeeRepository";
-import { getCardholderName } from "../utils/getCardholderName";
-import { checkExpirationDate } from "../utils/checkExpirationDate";
-import { CardUpdateData, TransactionTypes } from "../types/card";
-import { createCard } from "../utils/createCard";
+import { insert, update } from "../repositories/cardRepository";
 import { findByCardId } from "../repositories/paymentRepository";
 import { findByCardId as findReachargesByCardId } from "../repositories/rechargeRepository";
+import { CardUpdateData, TransactionTypes } from "../types/card";
+import { createCard } from "../utils/createCard";
+import {
+  cardIsActivated,
+  cardTypeRegistered,
+  checkCardBlockStatus,
+  checkCardIsExpired,
+  checkCardRegistered,
+  checkEmployeeRegistered,
+  checkPasswordIsCorrect,
+  checkValidApiKey,
+  cvcIsValid,
+  passwordIsValid,
+} from "./validationsService";
 
 export async function createCardService(
   apiKey: string,
   employeeId: number,
   cardType: TransactionTypes
 ) {
-  const company = await findByApiKey(apiKey);
-  if (!company) {
-    throw { type: "invalid_api_key", message: "Invalid API key" };
-  }
+  await checkValidApiKey(apiKey);
+  const employeeActive = await checkEmployeeRegistered(employeeId);
 
-  const employeeActive = await findById(employeeId);
-  if (!employeeActive) {
-    throw { type: "invalid_employee_id", message: "Invalid employee id" };
-  }
-
-  const employeeCardType = await findByTypeAndEmployeeId(cardType, employeeId);
-  if (employeeCardType) {
-    throw { type: "card_already_exists", message: "Card already exists" };
-  }
+  await cardTypeRegistered(cardType, employeeId);
 
   const cardData = createCard(employeeId, employeeActive, cardType);
 
@@ -54,18 +42,11 @@ export async function getCardBalanceService(
   fullName: string,
   expirationDate: string
 ) {
-  const cardholderName = getCardholderName(fullName);
-  const cardDB = await findByCardDetails(
+  const cardDB = await checkCardRegistered(
+    fullName,
     cardNumber,
-    cardholderName,
     expirationDate
   );
-  if (!cardDB) {
-    throw {
-      type: "invalid_card",
-      message: "Invalid card or card is not registered",
-    };
-  }
 
   const transactions = await findByCardId(cardDB.id);
   const recharges = await findReachargesByCardId(cardDB.id);
@@ -88,49 +69,16 @@ export async function activateCardService(
   password: number,
   CVC: string
 ) {
-  const cardholderName = getCardholderName(fullName);
-  const cardDB = await findByCardDetails(
+  const cardDB = await checkCardRegistered(
+    fullName,
     cardNumber,
-    cardholderName,
     expirationDate
   );
 
-  if (!cardDB) {
-    throw {
-      type: "invalid_card",
-      message: "Invalid card or card is not registered",
-    };
-  }
-
-  const expirationDateDB = cardDB.expirationDate;
-  const diff = checkExpirationDate(expirationDateDB);
-  if (diff < 0) {
-    throw { type: "card_expired", message: "Card is expired" };
-  }
-
-  if (cardDB.password) {
-    throw {
-      type: "card_already_activated",
-      message: "Card already activated",
-    };
-  }
-
-  const cryptr = new Cryptr(process.env.CRYPTR_SECRET);
-  const securityCodeDecrypted = cryptr.decrypt(cardDB.securityCode);
-
-  if (CVC !== securityCodeDecrypted) {
-    throw {
-      type: "invalid_cvc",
-      message: "Invalid CVC",
-    };
-  }
-
-  if (password.toString().length !== 4) {
-    throw {
-      type: "invalid_password",
-      message: "Invalid password. Password should be 4 digits",
-    };
-  }
+  await checkCardIsExpired(cardDB);
+  await cardIsActivated(cardDB);
+  await cvcIsValid(cardDB, CVC);
+  await passwordIsValid(password);
 
   const passwordEncrypted = hashSync(password.toString(), 10);
 
@@ -152,41 +100,15 @@ export async function blockCardService(
   expirationDate: string,
   password: number
 ) {
-  const cardholderName = getCardholderName(fullName);
-  const cardDB = await findByCardDetails(
+  const cardDB = await checkCardRegistered(
+    fullName,
     cardNumber,
-    cardholderName,
     expirationDate
   );
-  if (!cardDB) {
-    throw {
-      type: "invalid_card",
-      message: "Invalid card or card is not registered",
-    };
-  }
 
-  const expirationDateDB = cardDB.expirationDate;
-  const diff = checkExpirationDate(expirationDateDB);
-
-  if (diff < 0) {
-    throw { type: "card_expired", message: "Card is expired" };
-  }
-
-  const passwordDB = cardDB.password;
-  if (!compareSync(password.toString(), passwordDB)) {
-    throw {
-      type: "password_not_match",
-      message: "Password is incorrect",
-    };
-  }
-
-  const isCardDBBlocked = cardDB.isBlocked;
-  if (isCardDBBlocked) {
-    throw {
-      type: "card_already_blocked",
-      message: "Card already blocked",
-    };
-  }
+  await checkCardIsExpired(cardDB);
+  await checkPasswordIsCorrect(cardDB, password.toString());
+  await checkCardBlockStatus(cardDB, "isBlocked");
 
   const cardData: CardUpdateData = {
     isBlocked: true,
@@ -206,41 +128,15 @@ export async function unblockCardService(
   expirationDate: string,
   password: number
 ) {
-  const cardholderName = getCardholderName(fullName);
-  const cardDB = await findByCardDetails(
+  const cardDB = await checkCardRegistered(
+    fullName,
     cardNumber,
-    cardholderName,
     expirationDate
   );
-  if (!cardDB) {
-    throw {
-      type: "invalid_card",
-      message: "Invalid card or card is not registered",
-    };
-  }
 
-  const expirationDateDB = cardDB.expirationDate;
-  const diff = checkExpirationDate(expirationDateDB);
-
-  if (diff < 0) {
-    throw { type: "card_expired", message: "Card is expired" };
-  }
-
-  const passwordDB = cardDB.password;
-  if (!compareSync(password.toString(), passwordDB)) {
-    throw {
-      type: "password_not_match",
-      message: "Password is incorrect",
-    };
-  }
-
-  const isCardDBBlocked = cardDB.isBlocked;
-  if (!isCardDBBlocked) {
-    throw {
-      type: "card_already_unblocked",
-      message: "Card already unblocked",
-    };
-  }
+  await checkCardIsExpired(cardDB);
+  await checkPasswordIsCorrect(cardDB, password.toString());
+  await checkCardBlockStatus(cardDB, "isUnblocked");
 
   const cardData: CardUpdateData = {
     isBlocked: false,
