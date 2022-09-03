@@ -9,9 +9,9 @@ import {
   validateHeaderSchema,
   validateSchema,
 } from "../middlewares/schemaMiddleware";
+import { apiKeySchema } from "../schemas/apiKeySchema";
 import {
   activateCardSchema,
-  apiKeySchema,
   blockUnblockCardSchema,
   createCardSchema,
 } from "../schemas/cardSchema";
