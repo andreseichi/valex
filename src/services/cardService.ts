@@ -17,6 +17,8 @@ import { getCardholderName } from "../utils/getCardholderName";
 import { checkExpirationDate } from "../utils/checkExpirationDate";
 import { CardUpdateData, TransactionTypes } from "../types/card";
 import { createCard } from "../utils/createCard";
+import { findByCardId } from "../repositories/paymentRepository";
+import { findByCardId as findReachargesByCardId } from "../repositories/rechargeRepository";
 
 export async function createCardService(
   apiKey: string,
@@ -44,6 +46,38 @@ export async function createCardService(
   return {
     type: "success",
     message: "New card created. You need to create a password to active it",
+  };
+}
+
+export async function getCardBalanceService(
+  cardNumber: string,
+  fullName: string,
+  expirationDate: string
+) {
+  const cardholderName = getCardholderName(fullName);
+  const cardDB = await findByCardDetails(
+    cardNumber,
+    cardholderName,
+    expirationDate
+  );
+  if (!cardDB) {
+    throw {
+      type: "invalid_card",
+      message: "Invalid card or card is not registered",
+    };
+  }
+
+  const transactions = await findByCardId(cardDB.id);
+  const recharges = await findReachargesByCardId(cardDB.id);
+
+  const balance =
+    recharges.reduce((acc, current) => acc + current.amount, 0) -
+    transactions.reduce((acc, current) => acc + current.amount, 0);
+
+  return {
+    balance,
+    transactions,
+    recharges,
   };
 }
 

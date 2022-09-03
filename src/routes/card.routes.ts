@@ -3,6 +3,7 @@ import {
   activateCard,
   blockCard,
   createCard,
+  getCardBalance,
   unblockCard,
 } from "../controllers/cardController";
 import {
@@ -12,6 +13,7 @@ import {
 import { apiKeySchema } from "../schemas/apiKeySchema";
 import {
   activateCardSchema,
+  balanceCardSchema,
   blockUnblockCardSchema,
   createCardSchema,
 } from "../schemas/cardSchema";
@@ -23,6 +25,12 @@ cardRouter.post(
   validateHeaderSchema(apiKeySchema),
   validateSchema(createCardSchema),
   createCard
+);
+
+cardRouter.post(
+  "/card/balance",
+  validateSchema(balanceCardSchema),
+  getCardBalance
 );
 
 cardRouter.put(
