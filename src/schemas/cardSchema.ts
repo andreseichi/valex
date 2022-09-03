@@ -9,7 +9,9 @@ export const createCardSchema = joi.object({
 });
 
 export const activateCardSchema = joi.object({
-  id: joi.number().required(),
+  number: joi.string().required(),
+  cardholderName: joi.string().required(),
+  expirationDate: joi.string().required(),
   CVC: joi.string().required(),
   password: joi.number().required(),
 });
@@ -20,7 +22,7 @@ export const balanceCardSchema = joi.object({
   expirationDate: joi.string().required(),
 });
 
-export const blockUnblockCardSchema = joi.object({
+export const validateCardSchema = joi.object({
   number: joi.string().required(),
   cardholderName: joi.string().required(),
   expirationDate: joi.string().required(),

@@ -82,11 +82,19 @@ export async function getCardBalanceService(
 }
 
 export async function activateCardService(
-  cardId: number,
-  CVC: string,
-  password: number
+  cardNumber: string,
+  fullName: string,
+  expirationDate: string,
+  password: number,
+  CVC: string
 ) {
-  const cardDB = await findCardById(cardId);
+  const cardholderName = getCardholderName(fullName);
+  const cardDB = await findByCardDetails(
+    cardNumber,
+    cardholderName,
+    expirationDate
+  );
+
   if (!cardDB) {
     throw {
       type: "invalid_card",
@@ -94,9 +102,8 @@ export async function activateCardService(
     };
   }
 
-  const expirationDate = cardDB.expirationDate;
-  const diff = checkExpirationDate(expirationDate);
-
+  const expirationDateDB = cardDB.expirationDate;
+  const diff = checkExpirationDate(expirationDateDB);
   if (diff < 0) {
     throw { type: "card_expired", message: "Card is expired" };
   }
@@ -131,7 +138,7 @@ export async function activateCardService(
     password: passwordEncrypted,
   };
 
-  await update(cardId, cardData);
+  await update(cardDB.id, cardData);
 
   return {
     type: "success",

@@ -40,10 +40,27 @@ export async function getCardBalance(req: Request, res: Response) {
 }
 
 export async function activateCard(req: Request, res: Response) {
-  const { id, CVC, password }: { id: number; CVC: string; password: number } =
-    res.locals.body;
+  const {
+    number,
+    cardholderName,
+    expirationDate,
+    password,
+    CVC,
+  }: {
+    number: string;
+    cardholderName: string;
+    expirationDate: string;
+    password: number;
+    CVC: string;
+  } = res.locals.body;
 
-  const result = await activateCardService(id, CVC, password);
+  const result = await activateCardService(
+    number,
+    cardholderName,
+    expirationDate,
+    password,
+    CVC
+  );
 
   return res.send({ result });
 }

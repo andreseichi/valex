@@ -14,7 +14,7 @@ import { apiKeySchema } from "../schemas/apiKeySchema";
 import {
   activateCardSchema,
   balanceCardSchema,
-  blockUnblockCardSchema,
+  validateCardSchema,
   createCardSchema,
 } from "../schemas/cardSchema";
 
@@ -39,15 +39,11 @@ cardRouter.put(
   activateCard
 );
 
-cardRouter.put(
-  "/card/block",
-  validateSchema(blockUnblockCardSchema),
-  blockCard
-);
+cardRouter.put("/card/block", validateSchema(validateCardSchema), blockCard);
 
 cardRouter.put(
   "/card/unblock",
-  validateSchema(blockUnblockCardSchema),
+  validateSchema(validateCardSchema),
   unblockCard
 );
 
