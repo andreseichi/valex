@@ -11,7 +11,10 @@ type typeEnum =
   | "card_already_blocked"
   | "card_already_unblocked"
   | "card_not_activated"
-  | "card_blocked";
+  | "card_blocked"
+  | "business_not_found"
+  | "invalid_card_type"
+  | "insufficient_balance";
 
 export interface errors {
   type: typeEnum;

@@ -46,5 +46,14 @@ export const errorHandlingMiddleware = (
   if (error.type === "card_blocked")
     return res.status(401).send({ message: error.message });
 
+  if (error.type === "business_not_found")
+    return res.status(404).send({ message: error.message });
+
+  if (error.type === "invalid_card_type")
+    return res.status(401).send({ message: error.message });
+
+  if (error.type === "insufficient_balance")
+    return res.status(401).send({ message: error.message });
+
   return res.sendStatus(500);
 };
