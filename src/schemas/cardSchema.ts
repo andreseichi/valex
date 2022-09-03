@@ -20,7 +20,7 @@ export const activateCardSchema = joi.object({
   password: joi.number().required(),
 });
 
-export const blockCardSchema = joi.object({
+export const blockUnblockCardSchema = joi.object({
   number: joi.string().required(),
   cardholderName: joi.string().required(),
   expirationDate: joi.string().required(),
