@@ -23,7 +23,6 @@ export async function rechargeCard(req: Request, res: Response) {
     expirationDate,
     amount
   );
-  console.log(result);
 
   return res.send({ result });
 }
