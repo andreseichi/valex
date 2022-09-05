@@ -21,7 +21,7 @@ import {
 const cardRouter = Router();
 
 cardRouter.post(
-  "/card",
+  "/card/create",
   validateHeaderSchema(apiKeySchema),
   validateSchema(createCardSchema),
   createCard
