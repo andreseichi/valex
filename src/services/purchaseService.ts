@@ -12,7 +12,7 @@ export async function purchaseCardService(
   cardNumber: string,
   fullName: string,
   expirationDate: string,
-  password: number,
+  password: string,
   businessId: number,
   amount: number
 ) {
@@ -50,7 +50,7 @@ export async function purchaseCardService(
   }
 
   const passwordDB = cardDB.password;
-  if (!compareSync(password.toString(), passwordDB)) {
+  if (!compareSync(password, passwordDB)) {
     throw {
       type: "password_not_match",
       message: "Password is incorrect",

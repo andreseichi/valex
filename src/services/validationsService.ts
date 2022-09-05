@@ -51,8 +51,8 @@ export async function cvcIsValid(card: Card, CVC: string) {
   }
 }
 
-export async function passwordIsValid(password: number) {
-  if (password.toString().length !== 4) {
+export async function passwordIsValid(password: string) {
+  if (password.length !== 4) {
     throw {
       type: "invalid_password",
       message: "Invalid password. Password should be 4 digits",

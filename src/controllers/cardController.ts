@@ -16,7 +16,7 @@ export async function createCard(req: Request, res: Response) {
 
   const result = await createCardService(apiKey, employeeId, cardType);
 
-  return res.status(201).send({ result });
+  return res.status(201).send(result);
 }
 
 export async function getCardBalance(req: Request, res: Response) {
@@ -32,7 +32,7 @@ export async function getCardBalance(req: Request, res: Response) {
 
   const result = await getCardBalanceService(number, fullName, expirationDate);
 
-  return res.send({ result });
+  return res.send(result);
 }
 
 export async function activateCard(req: Request, res: Response) {
@@ -46,7 +46,7 @@ export async function activateCard(req: Request, res: Response) {
     number: string;
     fullName: string;
     expirationDate: string;
-    password: number;
+    password: string;
     CVC: string;
   } = res.locals.body;
 
@@ -71,7 +71,7 @@ export async function blockCard(req: Request, res: Response) {
     number: string;
     fullName: string;
     expirationDate: string;
-    password: number;
+    password: string;
   } = res.locals.body;
 
   const result = await blockCardService(
@@ -94,7 +94,7 @@ export async function unblockCard(req: Request, res: Response) {
     number: string;
     fullName: string;
     expirationDate: string;
-    password: number;
+    password: string;
   } = res.locals.body;
 
   const result = await unblockCardService(

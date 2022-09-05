@@ -1,4 +1,5 @@
 import { hashSync } from "bcrypt";
+import Cryptr from "cryptr";
 
 import { insert, update } from "../repositories/cardRepository";
 import { findByCardId } from "../repositories/paymentRepository";
@@ -29,11 +30,13 @@ export async function createCardService(
   await cardTypeRegistered(cardType, employeeId);
 
   const cardData = createCard(employeeId, employeeActive, cardType);
+  const cryptr = new Cryptr(process.env.CRYPTR_SECRET);
+  const originalCVC = cryptr.decrypt(cardData.securityCode);
 
   await insert(cardData);
+
   return {
-    type: "success",
-    message: "New card created. You need to create a password to active it",
+    card: { ...cardData, securityCode: originalCVC },
   };
 }
 
@@ -66,7 +69,7 @@ export async function activateCardService(
   cardNumber: string,
   fullName: string,
   expirationDate: string,
-  password: number,
+  password: string,
   CVC: string
 ) {
   const cardDB = await checkCardRegistered(
@@ -98,7 +101,7 @@ export async function blockCardService(
   cardNumber: string,
   fullName: string,
   expirationDate: string,
-  password: number
+  password: string
 ) {
   const cardDB = await checkCardRegistered(
     fullName,
@@ -107,7 +110,7 @@ export async function blockCardService(
   );
 
   await checkCardIsExpired(cardDB);
-  await checkPasswordIsCorrect(cardDB, password.toString());
+  await checkPasswordIsCorrect(cardDB, password);
   await checkCardBlockStatus(cardDB, "isBlocked");
 
   const cardData: CardUpdateData = {
@@ -126,7 +129,7 @@ export async function unblockCardService(
   cardNumber: string,
   fullName: string,
   expirationDate: string,
-  password: number
+  password: string
 ) {
   const cardDB = await checkCardRegistered(
     fullName,
@@ -135,7 +138,7 @@ export async function unblockCardService(
   );
 
   await checkCardIsExpired(cardDB);
-  await checkPasswordIsCorrect(cardDB, password.toString());
+  await checkPasswordIsCorrect(cardDB, password);
   await checkCardBlockStatus(cardDB, "isUnblocked");
 
   const cardData: CardUpdateData = {

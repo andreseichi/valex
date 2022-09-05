@@ -13,7 +13,7 @@ export async function purchase(req: Request, res: Response) {
     number: string;
     fullName: string;
     expirationDate: string;
-    password: number;
+    password: string;
     businessId: number;
     amount: number;
   } = res.locals.body;
