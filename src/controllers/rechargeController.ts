@@ -24,5 +24,5 @@ export async function rechargeCard(req: Request, res: Response) {
     amount
   );
 
-  return res.send({ result });
+  return res.send(result);
 }

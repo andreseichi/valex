@@ -58,7 +58,7 @@ export async function activateCard(req: Request, res: Response) {
     CVC
   );
 
-  return res.send({ result });
+  return res.send(result);
 }
 
 export async function blockCard(req: Request, res: Response) {
@@ -81,7 +81,7 @@ export async function blockCard(req: Request, res: Response) {
     password
   );
 
-  return res.send({ result });
+  return res.send(result);
 }
 
 export async function unblockCard(req: Request, res: Response) {
@@ -104,5 +104,5 @@ export async function unblockCard(req: Request, res: Response) {
     password
   );
 
-  return res.send({ result });
+  return res.send(result);
 }
