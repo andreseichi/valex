@@ -4,7 +4,7 @@ export const purchaseSchema = joi.object({
   number: joi.string().required(),
   fullName: joi.string().required(),
   expirationDate: joi.string().required(),
-  password: joi.number().required(),
+  password: joi.string().required(),
   businessId: joi.number().required(),
   amount: joi.number().greater(0).required(),
 });
