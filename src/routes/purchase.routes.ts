@@ -5,6 +5,6 @@ import { purchaseSchema } from "../schemas/purschageSchema";
 
 const purchaseRouter = Router();
 
-purchaseRouter.post("/purchase", validateSchema(purchaseSchema), purchase);
+purchaseRouter.post("/card/purchase", validateSchema(purchaseSchema), purchase);
 
 export { purchaseRouter };

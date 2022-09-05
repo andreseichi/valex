@@ -10,7 +10,7 @@ import { rechargeSchema } from "../schemas/rechargeSchema";
 const rechargeRouter = Router();
 
 rechargeRouter.post(
-  "/recharge",
+  "/card/recharge",
   validateHeaderSchema(apiKeySchema),
   validateSchema(rechargeSchema),
   rechargeCard
